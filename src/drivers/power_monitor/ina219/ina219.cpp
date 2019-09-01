@@ -53,8 +53,8 @@
 
 /* Configuration Constants */
 #define INA219_BUS_DEFAULT		                PX4_I2C_BUS_EXPANSION
-#define INA219_BASEADDR 	                    0x40 /* 7-bit address. 8-bit address is 0x41 */
-							 /*address pins A0 and A1 are both GND, CTSHEN */
+#define INA219_BASEADDR 	                    0x45 /* 7-bit address. 8-bit address is 0x41 */
+							 /*address pins A0 and A1 are both 1, CTSHEN */
 
 /* INA219 Registers addresses */
 #define INA219_REG_CONFIGURATION             (0x00)

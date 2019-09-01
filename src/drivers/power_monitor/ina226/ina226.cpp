@@ -52,7 +52,7 @@
 
 /* Configuration Constants */
 #define INA226_BUS_DEFAULT		                PX4_I2C_BUS_EXPANSION
-#define INA226_BASEADDR 	                    0x41 /* 7-bit address. 8-bit address is 0x41 */
+#define INA226_BASEADDR 	                    0x45 /* 7-bit address. 8-bit address is 0x41 */
 
 /* INA226 Registers addresses */
 #define INA226_REG_CONFIGURATION             (0x00)

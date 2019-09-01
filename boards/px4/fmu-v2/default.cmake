@@ -63,7 +63,7 @@ px4_add_board(
 		#test_ppm
 		tone_alarm
 		#uavcan
-		power_monitor/ina219 # CTShen
+		power_monitor/ina226 # CTShen
 
 	MODULES
 		#attitude_estimator_q
