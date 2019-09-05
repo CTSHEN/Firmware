@@ -525,7 +525,8 @@ start()
 	}
 
 	for (unsigned i = 0; i < NUM_I2C_BUS_OPTIONS; i++) {
-		PX4_INFO("b comes to here!"); //CTSHEN
+		//PX4_INFO("b comes to here!"); //CTSHEN
+		PX4_INFO("i2c_bus_options[%d] = %d", i, i2c_bus_options[i]);
 		if (start_bus(i2c_bus_options[i]) == PX4_OK) {
 			PX4_INFO("check point 2"); //CTSHEN
 			return PX4_OK;
@@ -550,8 +551,8 @@ start_bus(int i2c_bus)
 	}
 
 	/* create the driver */
-	g_dev = new INA219(i2c_bus);
-	PX4_INFO("new driver created! %d", i2c_bus); //CTSHEN
+	g_dev = new INA219(i2c_bus, INA219_BASEADDR);
+	PX4_INFO("new driver created! %p", g_dev); //CTSHEN
 
 	if (g_dev == nullptr) {
 		PX4_INFO("driver create fail 1"); // CTSHEN
@@ -638,12 +639,13 @@ ina219_main(int argc, char *argv[])
 		switch (ch) {
 
 		case 'b':
-			PX4_INFO("case b");
+			PX4_INFO("case b"); // CTSHEN
 			i2c_bus = atoi(myoptarg);
+			PX4_INFO("i2c_bus = %d", i2c_bus); //CTSHEN
 			break;
 
 		case 'a':
-			PX4_INFO("case a");
+			PX4_INFO("case a"); //CTSHEN
 			start_all = true;
 			break;
 

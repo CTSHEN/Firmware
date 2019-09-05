@@ -62,7 +62,7 @@ enum MS_DEVICE_TYPE {
 
 /* I2C bus address is 1010001x */
 #define I2C_ADDRESS_MS4515DO	0x46
-#define I2C_ADDRESS_MS4525DO	0x28	/**< 7-bit address. Depends on the order code (this is for code "I") */
+#define I2C_ADDRESS_MS4525DO	0x28	/**<0x28  7-bit address. Depends on the order code (this is for code "I") */
 #define PATH_MS4525		"/dev/ms4525"
 
 /* Register address */
@@ -364,7 +364,9 @@ int
 start()
 {
 	for (unsigned i = 0; i < NUM_I2C_BUS_OPTIONS; i++) {
+		PX4_INFO("i2c_bus_options[%d] = %d", i, i2c_bus_options[i]); //CTSHEN
 		if (start_bus(i2c_bus_options[i], I2C_ADDRESS_MS4525DO) == PX4_OK) {
+			PX4_INFO("bus %d start!", i2c_bus_options[i]);  //CTSHEN
 			return PX4_OK;
 		}
 	}
