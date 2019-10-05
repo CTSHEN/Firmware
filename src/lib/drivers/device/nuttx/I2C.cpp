@@ -98,6 +98,7 @@ I2C::init()
 
 	// attach to the i2c bus
 	_dev = px4_i2cbus_initialize(get_device_bus());
+	PX4_INFO("Mom~ I'm Here!"); //CTSHEN
 
 	if (_dev == nullptr) {
 		DEVICE_DEBUG("failed to init I2C");
@@ -141,6 +142,7 @@ I2C::init()
 
 	if (ret != OK) {
 		DEVICE_DEBUG("probe failed");
+		PX4_INFO("probe failed");
 		goto out;
 	}
 
@@ -149,6 +151,7 @@ I2C::init()
 
 	if (ret != OK) {
 		DEVICE_DEBUG("cdev init failed");
+		PX4_INFO("cdev init failed");
 		goto out;
 	}
 
@@ -173,6 +176,7 @@ I2C::transfer(const uint8_t *send, unsigned send_len, uint8_t *recv, unsigned re
 	unsigned msgs;
 	int ret = PX4_ERROR;
 	unsigned retry_count = 0;
+	PX4_INFO("device address : 0x%x, in i2c.cpp transfer() function", get_device_address()); //CTSHEN
 
 	if (_dev == nullptr) {
 		PX4_ERR("I2C device not opened");
@@ -181,6 +185,7 @@ I2C::transfer(const uint8_t *send, unsigned send_len, uint8_t *recv, unsigned re
 
 	do {
 		DEVICE_DEBUG("transfer out %p/%u  in %p/%u", send, send_len, recv, recv_len);
+		PX4_INFO("transfer out 0x%x%x%x/%u  in %p/%u", send[0],send[1],send[2], send_len, recv, recv_len); //CTSHEN
 		msgs = 0;
 
 		if (send_len > 0) {
@@ -202,6 +207,7 @@ I2C::transfer(const uint8_t *send, unsigned send_len, uint8_t *recv, unsigned re
 		}
 
 		if (msgs == 0) {
+			PX4_INFO("Return -EINVAL");
 			return -EINVAL;
 		}
 

@@ -393,6 +393,7 @@ start_bus(int i2c_bus, int address)
 
 	/* create the driver, try the MS4525DO first */
 	g_dev = new MEASAirspeed(i2c_bus, address, PATH_MS4525);
+	PX4_INFO("Create new driver: %p", g_dev);
 
 	/* check if the MS4525DO was instantiated */
 	if (g_dev == nullptr) {

@@ -52,8 +52,8 @@
 #include <px4_work_queue/ScheduledWorkItem.hpp>
 
 /* Configuration Constants */
-#define INA219_BUS_DEFAULT		                PX4_I2C_BUS_EXPANSION
-#define INA219_BASEADDR 	                    0x45 /* 7-bit address. 8-bit address is 0x41 */
+//#define INA219_BUS_DEFAULT		                PX4_I2C_BUS_EXPANSION
+#define INA219_BASEADDR 	                    0x45 /* 7-bit address. 1000101 */
 							 /*address pins A0 and A1 are both 1, CTSHEN */
 
 /* INA219 Registers addresses */
@@ -144,10 +144,12 @@
 
 #define swap16(w)                       __builtin_bswap16((w))
 
+static constexpr uint8_t INA219_BUS_DEFAULT = PX4_I2C_BUS_EXPANSION;
+
 class INA219 : public device::I2C, px4::ScheduledWorkItem
 {
 public:
-	INA219(int bus = INA219_BUS_DEFAULT, int address = INA219_BASEADDR);
+	INA219(int bus , int address = INA219_BASEADDR);
 	virtual ~INA219();
 
 	virtual int 		  init();
@@ -291,7 +293,11 @@ int INA219::read(uint8_t address)
 int INA219::write(uint8_t address, uint16_t value)
 {
 	uint8_t data[3] = {address, ((uint8_t)((value & 0xff00) >> 8)), (uint8_t)(value & 0xff)};
-	return transfer(data, sizeof(data), nullptr, 0);
+	//return transfer(data, sizeof(data), nullptr, 0); //CTSHEN
+	PX4_INFO("data = {0x%x, 0x%x, 0x%x}",data[0], data[1], data[2]); //CTSHEN
+	int ret = transfer(data, sizeof(data), nullptr, 0); //CTSHEN
+	PX4_INFO("ret = %d", ret); //CTSHEN
+	return ret; //CTSHEN
 }
 
 int
@@ -308,28 +314,33 @@ INA219::init()
 	write(INA219_REG_CONFIGURATION, INA219_RST);
 
 	_cal = INA219_CONST / (_current_lsb * INA219_SHUNT);
+	PX4_INFO("_cal = %d ", _cal); //CTSHEN
 
 	if (write(INA219_REG_CALIBRATION, _cal) < 0) {
+		PX4_INFO(" Write _cal to REG_CALIBRATION failed!"); //CTSHEN
 		return -3;
 	}
 
 	// If we run in continuous mode then start it here
 
-	if (!_mode_trigged) {
+	/*if (!_mode_trigged) {
 		ret = write(INA219_REG_CONFIGURATION, _config);
-	}
+	}*/
+	ret = PX4_OK;
 
 	set_device_address(INA219_BASEADDR);	/* set I2c Address */
 
 	start();
 	_sensor_ok = true;
 
+	PX4_INFO("ret = %d",ret); //CTSHEN
 	return ret;
 }
 
 int
 INA219::probe()
 {
+	/*PX4_INFO("The probe is here!");
 	int value = read(INA219_MFG_ID);
 
 	if (value < 0) {
@@ -350,7 +361,7 @@ INA219::probe()
 	if (value != INA219_MFG_DIE) {
 		PX4_DEBUG("probe die id %d", value);
 		return -1;
-	}
+	}*/
 
 	return OK;
 }
