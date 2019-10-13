@@ -406,7 +406,7 @@ INA219::collect()
 
 					struct power_monitor_s report;
 					report.timestamp = hrt_absolute_time();
-					report.voltage_v = (float) _bus_volatage * INA219_VSCALE;
+					report.voltage_v = (float) (_bus_volatage>>3) * INA219_VSCALE;
 					report.current_a = (float) _current * _current_lsb;
 					report.power_w   = (float) _power * _power_lsb;
 #if defined(INA219_RAW)
