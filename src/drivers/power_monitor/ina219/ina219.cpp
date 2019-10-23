@@ -53,7 +53,7 @@
 
 /* Configuration Constants */
 //#define INA219_BUS_DEFAULT		                PX4_I2C_BUS_EXPANSION
-#define INA219_BASEADDR 	                    0x45 /* 7-bit address. 1000101 */
+#define INA219_BASEADDR 	                    0x45 /* 7-bit address. 1000101 ==> 0x45 (solar_out) */
 							 /*address pins A0 and A1 are both 1, CTSHEN */
 
 /* INA219 Registers addresses */
@@ -63,13 +63,13 @@
 #define INA219_REG_POWER                     (0x03)
 #define INA219_REG_CURRENT                   (0x04)
 #define INA219_REG_CALIBRATION               (0x05)
-#define INA219_REG_MASKENABLE                (0x06)
-#define INA219_REG_ALERTLIMIT                (0x07)
-#define INA219_MFG_ID                        (0xfe)
-#define INA219_MFG_DIEID                     (0xff)
 
-#define INA219_MFG_ID_TI                     (0x5449) // TI
-#define INA219_MFG_DIE                       (0x2260) // INA2190
+
+
+
+
+
+
 
 /* INA219 Configuration Register */
 #define INA219_MODE_SHIFTS                   (0)
@@ -83,7 +83,7 @@
 #define INA219_MODE_BUS_CONT                 (6 << INA219_MODE_SHIFTS)
 #define INA219_MODE_SHUNT_BUS_CONT           (7 << INA219_MODE_SHIFTS)
 
-#define INA219_VSHCT_SHIFTS                  (3)
+/*#define INA219_VSHCT_SHIFTS                  (3)
 #define INA219_VSHCT_MASK                    (7 << INA219_VSHCT_SHIFTS)
 #define INA219_VSHCT_140US                   (0 << INA219_VSHCT_SHIFTS)
 #define INA219_VSHCT_204US                   (1 << INA219_VSHCT_SHIFTS)
@@ -115,13 +115,52 @@
 #define INA219_AVERAGES_256                   (5 << INA219_AVERAGES_SHIFTS)
 #define INA219_AVERAGES_512                   (6 << INA219_AVERAGES_SHIFTS)
 #define INA219_AVERAGES_1024                  (7 << INA219_AVERAGES_SHIFTS)
+*/
 
-#define INA219_CONFIG (INA219_MODE_SHUNT_BUS_CONT | INA219_VSHCT_588US | INA219_VBUSCT_588US | INA219_AVERAGES_64)
+#define INA219_SADC_SHIFTS			(3)
+#define INA219_SADC_9bit			(0 << INA219_SADC_SHIFTS)
+#define INA219_SADC_10bit			(1 << INA219_SADC_SHIFTS)
+#define INA219_SADC_11bit			(2 << INA219_SADC_SHIFTS)
+#define INA219_SADC_12bit			(3 << INA219_SADC_SHIFTS)
+#define INA219_SADC_12bit2			(8 << INA219_SADC_SHIFTS)
+#define INA219_SADC_2				(9 << INA219_SADC_SHIFTS)
+#define INA219_SADC_4				(10 << INA219_SADC_SHIFTS)
+#define INA219_SADC_8				(11 << INA219_SADC_SHIFTS)
+#define INA219_SADC_16				(12 << INA219_SADC_SHIFTS)
+#define INA219_SADC_32				(13 << INA219_SADC_SHIFTS)
+#define INA219_SADC_64				(14 << INA219_SADC_SHIFTS)
+#define INA219_SADC_128				(15 << INA219_SADC_SHIFTS)
+
+#define INA219_BADC_SHIFTS			(7)
+#define INA219_BADC_9bit			(0 << INA219_BADC_SHIFTS)
+#define INA219_BADC_10bit			(1 << INA219_BADC_SHIFTS)
+#define INA219_BADC_11bit			(2 << INA219_BADC_SHIFTS)
+#define INA219_BADC_12bit			(3 << INA219_BADC_SHIFTS)
+#define INA219_BADC_12bit2			(8 << INA219_BADC_SHIFTS)
+#define INA219_BADC_2				(9 << INA219_BADC_SHIFTS)
+#define INA219_BADC_4				(10 << INA219_BADC_SHIFTS)
+#define INA219_BADC_8				(11 << INA219_BADC_SHIFTS)
+#define INA219_BADC_16				(12 << INA219_BADC_SHIFTS)
+#define INA219_BADC_32				(13 << INA219_BADC_SHIFTS)
+#define INA219_BADC_64				(14 << INA219_BADC_SHIFTS)
+#define INA219_BADC_128				(15 << INA219_BADC_SHIFTS)
+
+#define INA219_PG_SHIFTS			(11)
+#define INA219_PG_1				(0 << INA219_PG_SHIFTS)
+#define INA219_PG_2				(1 << INA219_PG_SHIFTS)
+#define INA219_PG_4				(2 << INA219_PG_SHIFTS)
+#define INA219_PG_8				(3 << INA219_PG_SHIFTS)
+
+#define INA219_BRNG_SHIFTS			(13)
+#define INA219_BRNG_16				(0 << INA219_BRNG_SHIFTS)
+#define INA219_BRNG_32				(1 << INA219_BRNG_SHIFTS)
+
+#define INA219_CONFIG (INA219_MODE_SHUNT_BUS_CONT | INA219_SADC_12bit | INA219_BADC_12bit | INA219_PG_8 | INA219_BRNG_32)
 
 #define INA219_RST                            (1 << 15)
 
 /* INA219 Enable / Mask Register */
-
+/*
 #define INA219_LEN                           (1 << 0)
 #define INA219_APOL                          (1 << 1)
 #define INA219_OVF                           (1 << 2)
@@ -134,11 +173,11 @@
 #define INA219_BOL                           (1 << 13)
 #define INA219_SUL                           (1 << 14)
 #define INA219_SOL                           (1 << 15)
-
+*/
 #define INA219_CONVERSION_INTERVAL 	          (100000-7) /* 100 ms / 10 Hz */
 #define MAX_CURRENT                           8.0f    /* +-8 Amps CTSHEN*/
 #define DN_MAX                                32768.0f  /* 2^15 */
-#define INA219_CONST                          0.00512f  /* is an internal fixed value used to ensure scaling is maintained properly  */
+#define INA219_CONST                          0.04096f  /* is an internal fixed value used to ensure scaling is maintained properly  */
 #define INA219_SHUNT                          0.01f   /* Shunt is 0.01 Ohm CTHSHEN */
 #define INA219_VSCALE                         0.004f  /* LSB of voltage is 4 mV  CTSHEN */
 
@@ -183,7 +222,7 @@ private:
 	float             _rshunt{INA219_SHUNT};
 	uint16_t          _config{INA219_CONFIG};
 	float             _current_lsb{_max_current / DN_MAX};
-	float             _power_lsb{25.0f * _current_lsb};
+	float             _power_lsb{20.0f * _current_lsb};
 
 	/**
 	* Test whetpower_monitorhe device supported by the driver is present at a
@@ -254,12 +293,10 @@ INA219::INA219(int bus, int address) :
 		_config = (uint16_t)value;
 	}
 
-	_mode_trigged = ((_config & INA219_MODE_MASK) >> INA219_MODE_SHIFTS) <=
-			((INA219_MODE_SHUNT_BUS_TRIG & INA219_MODE_MASK) >>
-			 INA219_MODE_SHIFTS);
+	_mode_trigged = false;
 
 	_current_lsb = _max_current / DN_MAX;
-	_power_lsb = 25 * _current_lsb;
+	_power_lsb = 20 * _current_lsb;
 }
 
 INA219::~INA219()
@@ -323,9 +360,9 @@ INA219::init()
 
 	// If we run in continuous mode then start it here
 
-	/*if (!_mode_trigged) {
+	if (!_mode_trigged) {
 		ret = write(INA219_REG_CONFIGURATION, _config);
-	}*/
+	}
 	ret = PX4_OK;
 
 	set_device_address(INA219_BASEADDR);	/* set I2c Address */
@@ -393,20 +430,21 @@ INA219::collect()
 
 	ret = _bus_volatage = read(INA219_REG_BUSVOLTAGE);
 
-	if (_bus_volatage >= 0) {
+	if (true) {  // (_bus_volatage>>3) >= 0
 		ret = _power = read(INA219_REG_POWER);
+		//PX4_INFO("BV!!");
 
-		if (_power >= 0) {
+		if (true) { //_power >= 0
 			ret = _current = read(INA219_REG_CURRENT);
 
-			if (_current >= 0) {
+			if (true) { //_current >= 0
 				ret = _shunt = read(INA219_REG_SHUNTVOLTAGE);
 
-				if (_shunt >= 0) {
+				if (true) { // _shunt >= 0
 
 					struct power_monitor_s report;
 					report.timestamp = hrt_absolute_time();
-					report.voltage_v = (float) (_bus_volatage>>3) * INA219_VSCALE;
+					report.voltage_v = (float) ((uint16_t)_bus_volatage>>3 | 0x0000) * INA219_VSCALE;
 					report.current_a = (float) _current * _current_lsb;
 					report.power_w   = (float) _power * _power_lsb;
 #if defined(INA219_RAW)
@@ -416,8 +454,8 @@ INA219::collect()
 					report.rp     = read(INA219_REG_POWER);
 					report.rc     = read(INA219_REG_CURRENT);
 					report.rcal   = read(INA219_REG_CALIBRATION);
-					report.me     = read(INA219_REG_MASKENABLE);
-					report.al     = read(INA219_REG_ALERTLIMIT);
+
+
 #endif
 
 					/* publish it */
