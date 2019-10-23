@@ -13,3 +13,5 @@ int16 rc
 int16 rcal
 int16 me
 int16 al
+
+# TOPICS power_monitor power_solar_in power_solar_out

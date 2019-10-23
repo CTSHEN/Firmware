@@ -460,7 +460,7 @@ INA219::collect()
 
 					/* publish it */
 					int instance;
-					orb_publish_auto(ORB_ID(power_monitor), &_power_monitor_topic, &report, &instance, ORB_PRIO_DEFAULT);
+					orb_publish_auto(ORB_ID(power_solar_out), &_power_monitor_topic, &report, &instance, ORB_PRIO_DEFAULT);
 
 					ret = OK;
 					perf_end(_sample_perf);
