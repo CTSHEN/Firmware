@@ -108,6 +108,9 @@
 #include <uORB/topics/vehicle_magnetometer.h>
 #include <uORB/uORB.h>
 
+#include <uORB/topics/power_monitor.h> // CTSHEN
+#include <v2.0/custom_messages/mavlink_msg_ina219.h> //CTSHEN
+
 using matrix::wrap_2pi;
 
 static uint16_t cm_uint16_from_m_float(float m);
@@ -5002,6 +5005,63 @@ protected:
 		return false;
 	}
 };
+/*CTSHEN
+ * Create two costum MAVLink msgs PowerSolarIn and PowerSolarOut
+ */
+
+class MavlinkStreamPowerSoalrIn : public MavlinkStream
+{
+public :
+	const char *get_name() const
+	{
+		return MavlinkStreamPowerSoalrIn::get_name_static();
+	}
+
+	static const char *get_name_static()
+	{
+		return "POWER_SOLAR_IN";
+	}
+
+	static uint16_t get_id_static()
+	{
+		return MAVLINK_MSG_ID_ina219;
+	}
+
+	uint16_t get_id()
+	{
+		return get_id_static();
+	}
+
+	static MavlinkStream *new_instance(Mavlink *mavlink)
+	{
+		return new MavlinkStreamPowerSoalrIn(mavlink);
+	}
+
+	unsigned get_size()
+	{
+		return MAVLINK_MSG_ID_ina219_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES;
+	}
+
+private:
+	MavlinkOrbSubscription *_power_solar_in_sub;
+	uint64_t _power_solar_in_time;
+
+	/* do not allow top copying this class */
+	MavlinkStreamPowerSoalrIn(MavlinkStreamPowerSoalrIn &);
+	MavlinkStreamPowerSoalrIn &operator = (const MavlinkStreamPowerSoalrIn &);
+
+protected:
+	explicit MavlinkStreamPowerSoalrIn(Mavlink *mavlink) : MavlinkStream(mavlink),
+		_power_solar_in_sub(_mavlink->add_orb_subscription(ORB_ID(power_solar_in))),
+		_power_solar_in_time(0)
+	{}
+
+	bool send(const hrt_abstime t)
+	{
+		struct power_monitor
+	}
+
+}
 
 static const StreamListItem streams_list[] = {
 	StreamListItem(&MavlinkStreamHeartbeat::new_instance, &MavlinkStreamHeartbeat::get_name_static, &MavlinkStreamHeartbeat::get_id_static),
