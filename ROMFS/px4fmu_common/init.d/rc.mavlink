@@ -9,5 +9,7 @@ if ! ver hwcmp INTEL_AEROFC_V1
 then
 	# Start MAVLink on the USB port
 	mavlink start -r 800000 -d /dev/ttyACM0 -m config -x
+	mavlink stream -r 10 -s POWER_SOLAR_IN
+	mavlink stream -r 10 -s POWER_SOLAR_OUT
 fi
 
