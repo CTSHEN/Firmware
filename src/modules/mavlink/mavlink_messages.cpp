@@ -5006,20 +5006,20 @@ protected:
 	}
 };
 /*CTSHEN
- * Create two costum MAVLink msgs PowerSolarIn and PowerSolarOut
+ * Create two costum MAVLink msgs PowerSolar
  */
-// PowerSoalrIn
-class MavlinkStreamPowerSoalrIn : public MavlinkStream
+// PowerSolar
+class MavlinkStreamPowerSolar : public MavlinkStream
 {
 public :
 	const char *get_name() const
 	{
-		return MavlinkStreamPowerSoalrIn::get_name_static();
+		return MavlinkStreamPowerSolar::get_name_static();
 	}
 
 	static const char *get_name_static()
 	{
-		return "POWER_SOLAR_IN";
+		return "POWER_SOLAR";
 	}
 
 	static uint16_t get_id_static()
@@ -5034,7 +5034,7 @@ public :
 
 	static MavlinkStream *new_instance(Mavlink *mavlink)
 	{
-		return new MavlinkStreamPowerSoalrIn(mavlink);
+		return new MavlinkStreamPowerSolar(mavlink);
 	}
 
 	unsigned get_size()
@@ -5044,101 +5044,40 @@ public :
 
 private:
 	MavlinkOrbSubscription *_power_solar_in_sub;
-	uint64_t _power_solar_in_time;
+	MavlinkOrbSubscription *_power_solar_out_sub;
+	uint64_t _power_solar_time;
 
 	/* do not allow top copying this class */
-	MavlinkStreamPowerSoalrIn(MavlinkStreamPowerSoalrIn &);
-	MavlinkStreamPowerSoalrIn &operator = (const MavlinkStreamPowerSoalrIn &);
+	MavlinkStreamPowerSolar(MavlinkStreamPowerSolar &);
+	MavlinkStreamPowerSolar &operator = (const MavlinkStreamPowerSolar &);
 
 protected:
-	explicit MavlinkStreamPowerSoalrIn(Mavlink *mavlink) : MavlinkStream(mavlink),
+	explicit MavlinkStreamPowerSolar(Mavlink *mavlink) : MavlinkStream(mavlink),
 		_power_solar_in_sub(_mavlink->add_orb_subscription(ORB_ID(power_solar_in))),
-		_power_solar_in_time(0)
+		_power_solar_out_sub(_mavlink->add_orb_subscription(ORB_ID(power_solar_out))),
+		_power_solar_time(0)
 	{}
 
 	bool send(const hrt_abstime t)
 	{
 		struct power_monitor_s _solar_in;
-
-		if(_power_solar_in_sub->update(&_power_solar_in_time, &_solar_in)){
-			mavlink_ina219_t _msg_power_solar_in = {};
-
-			_msg_power_solar_in.timestamp = _solar_in.timestamp;
-			_msg_power_solar_in.voltage = _solar_in.voltage_v;
-			_msg_power_solar_in.current = _solar_in.current_a;
-			_msg_power_solar_in.power = _solar_in.power_w;
-
-			mavlink_msg_ina219_send_struct(_mavlink->get_channel(), &_msg_power_solar_in);
-
-		}
-
-		return true;
-
-	}
-
-};
-
-// PowerSoalrOut
-class MavlinkStreamPowerSoalrOut : public MavlinkStream
-{
-public :
-	const char *get_name() const
-	{
-		return MavlinkStreamPowerSoalrOut::get_name_static();
-	}
-
-	static const char *get_name_static()
-	{
-		return "POWER_SOLAR_OUT";
-	}
-
-	static uint16_t get_id_static()
-	{
-		return MAVLINK_MSG_ID_ina219;
-	}
-
-	uint16_t get_id()
-	{
-		return get_id_static();
-	}
-
-	static MavlinkStream *new_instance(Mavlink *mavlink)
-	{
-		return new MavlinkStreamPowerSoalrOut(mavlink);
-	}
-
-	unsigned get_size()
-	{
-		return MAVLINK_MSG_ID_ina219_LEN + MAVLINK_NUM_NON_PAYLOAD_BYTES;
-	}
-
-private:
-	MavlinkOrbSubscription *_power_solar_out_sub;
-	uint64_t _power_solar_out_time;
-
-	/* do not allow top copying this class */
-	MavlinkStreamPowerSoalrOut(MavlinkStreamPowerSoalrOut &);
-	MavlinkStreamPowerSoalrOut &operator = (const MavlinkStreamPowerSoalrOut &);
-
-protected:
-	explicit MavlinkStreamPowerSoalrOut(Mavlink *mavlink) : MavlinkStream(mavlink),
-		_power_solar_out_sub(_mavlink->add_orb_subscription(ORB_ID(power_solar_out))),
-		_power_solar_out_time(0)
-	{}
-
-	bool send(const hrt_abstime t)
-	{
 		struct power_monitor_s _solar_out;
 
-		if(_power_solar_out_sub->update(&_power_solar_out_time, &_solar_out)){
-			mavlink_ina219_t _msg_power_solar_out = {};
+		bool solarIn_updated = _power_solar_in_sub->update(&_power_solar_time, &_solar_in);
+		bool solarOut_updated = _power_solar_out_sub->update(&_power_solar_time, &_solar_out);
 
-			_msg_power_solar_out.timestamp = _solar_out.timestamp;
-			_msg_power_solar_out.voltage = _solar_out.voltage_v;
-			_msg_power_solar_out.current = _solar_out.current_a;
-			_msg_power_solar_out.power = _solar_out.power_w;
+		if(solarIn_updated || solarOut_updated){
+			mavlink_ina219_t _msg_power_solar = {};
 
-			mavlink_msg_ina219_send_struct(_mavlink->get_channel(), &_msg_power_solar_out);
+			_msg_power_solar.timestamp = _solar_in.timestamp;
+			_msg_power_solar.voltageIn = _solar_in.voltage_v;
+			_msg_power_solar.currentIn = _solar_in.current_a;
+			_msg_power_solar.powerIn = _solar_in.power_w;
+			_msg_power_solar.voltageOut = _solar_out.voltage_v;
+			_msg_power_solar.currentOut = _solar_out.current_a;
+			_msg_power_solar.powerOut = _solar_out.power_w;
+
+			mavlink_msg_ina219_send_struct(_mavlink->get_channel(), &_msg_power_solar);
 
 		}
 
@@ -5147,6 +5086,8 @@ protected:
 	}
 
 };
+
+
 
 static const StreamListItem streams_list[] = {
 	StreamListItem(&MavlinkStreamHeartbeat::new_instance, &MavlinkStreamHeartbeat::get_name_static, &MavlinkStreamHeartbeat::get_id_static),
@@ -5210,9 +5151,8 @@ static const StreamListItem streams_list[] = {
 	StreamListItem(&MavlinkStreamObstacleDistance::new_instance, &MavlinkStreamObstacleDistance::get_name_static, &MavlinkStreamObstacleDistance::get_id_static),
 
 	//CTSHEN
-	StreamListItem(&MavlinkStreamPowerSoalrIn::new_instance, &MavlinkStreamPowerSoalrIn::get_name_static, &MavlinkStreamPowerSoalrIn::get_id_static),
-	StreamListItem(&MavlinkStreamPowerSoalrOut::new_instance, &MavlinkStreamPowerSoalrOut::get_name_static, &MavlinkStreamPowerSoalrOut::get_id_static)
-};
+	StreamListItem(&MavlinkStreamPowerSolar::new_instance, &MavlinkStreamPowerSolar::get_name_static, &MavlinkStreamPowerSolar::get_id_static)
+	};
 
 const char *get_stream_name(const uint16_t msg_id)
 {
